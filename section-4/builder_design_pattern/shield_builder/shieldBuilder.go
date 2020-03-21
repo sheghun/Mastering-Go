@@ -39,13 +39,12 @@ func (sh *shBuilder) RaiseLeft() *shBuilder {
 	return sh
 }
 
-
 func (sh *shBuilder) Build() *shield {
 	code := sh.code
 	return &shield{
-		front: strings.Contains(code ,"F"),
-		back: strings.Contains(code ,"B"),
-		left: strings.Contains(code ,"L"),
-		right: strings.Contains(code ,"R"),
+		front: strings.Contains(code, "F"),
+		back:  strings.Contains(code, "B"),
+		left:  strings.Contains(code, "L"),
+		right: strings.Contains(code, "R"),
 	}
 }
