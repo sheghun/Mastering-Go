@@ -2,40 +2,39 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"sync"
+	"time"
 )
 
-type safeCounter struct {
-	i int
-	sync.Mutex
+type MapCounter struct {
+	m map[int]int
+	sync.RWMutex
+}
+
+func runWriters(mc *MapCounter, n int) {
+	for i := 0; i < n; i++ {
+		//mc.Lock()
+		mc.m[i] = i * 10
+		//mc.Unlock()
+		time.Sleep(1 * time.Second)
+	}
+}
+
+func runReaders(mc *MapCounter, n int) {
+	for {
+		mc.RLock()
+		v := mc.m[rand.Intn(n)]
+		mc.RUnlock()
+		fmt.Println(v)
+		time.Sleep(1 * time.Second)
+	}
 }
 
 func main() {
-	sc := new(safeCounter)
-
-	for i := 0; i < 100; i++ {
-		go sc.Increment()
-		go sc.Decrement()
-	}
-
-	fmt.Println(sc.GetValue())
-}
-
-func (sc *safeCounter) Increment() {
-	sc.Lock()
-	sc.i++
-	sc.Unlock()
-}
-
-func (sc *safeCounter) Decrement() {
-	sc.Lock()
-	sc.i--
-	sc.Unlock()
-}
-
-func (sc *safeCounter) GetValue() int {
-	sc.Lock()
-	v := sc.i
-	sc.Unlock()
-	return v
+	mc := MapCounter{m: make(map[int]int)}
+	go runWriters(&mc, 10)
+	go runReaders(&mc, 10)
+	go runReaders(&mc, 10)
+	time.Sleep(15 * time.Second)
 }
