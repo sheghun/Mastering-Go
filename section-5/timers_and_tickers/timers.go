@@ -23,6 +23,7 @@ func SlowCounter(n int, nc chan int, stopc chan bool) {
 	// create a duration of seconds
 	d := time.Duration(n) * time.Second
 
+Loop:
 	for {
 		select {
 		case <-time.After(d):
@@ -35,7 +36,8 @@ func SlowCounter(n int, nc chan int, stopc chan bool) {
 
 		case <-stopc:
 			fmt.Println("Timer stopped")
-			break
+			break Loop
+
 		}
 	}
 
